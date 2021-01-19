@@ -334,7 +334,9 @@ void init_gsoap()
     // Note that this IP_ADD_MEMBERSHIP option must be
     // called for each local interface over which the multicast
     // datagrams are to be received.
+    /*
     struct ip_mreqn mcast;
+    
     mcast.imr_multiaddr.s_addr = inet_addr(WSDD_MULTICAST_IP);
     if( get_addr_of_if(wsdd_param.if_name, AF_INET, &mcast.imr_address) != 0 )
     {
@@ -346,6 +348,14 @@ void init_gsoap()
     if(setsockopt(soap_srv->master, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mcast, sizeof(mcast)) != 0 )
     {
         daemon_error_exit("Cant adding multicast group error: %m\n");
+    }
+    */
+    struct ip_mreq mcast;
+    mcast.imr_multiaddr.s_addr = inet_addr(WSDD_MULTICAST_IP);
+    mcast.imr_interface.s_addr = htonl(INADDR_ANY);
+    if(setsockopt(soap_srv->master, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mcast, sizeof(mcast)) != 0 )
+    {
+        daemon_error_exit("Failed to add multicast group error: %m\n");
     }
 }
 
